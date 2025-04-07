@@ -9,21 +9,28 @@ then
     sudo apt install -y lsb-core
 fi
 
+
+# after first run, comment out git clone 
 echo "Installing binwalk"
-git clone --depth=1 https://github.com/ReFirmLabs/binwalk.git
+git clone --depth 1 --branch v2.3.4 https://github.com/ReFirmLabs/binwalk
 cd binwalk
 
 # Temporary fix for sasquatch failing to install (From https://github.com/ReFirmLabs/binwalk/pull/601)
-sed -i 's;\$SUDO ./build.sh;wget https://github.com/devttys0/sasquatch/pull/47.patch \&\& patch -p1 < 47.patch \&\& \$SUDO ./build.sh;' deps.sh
+# sed -i 's;\$SUDO ./build.sh;wget https://github.com/devttys0/sasquatch/pull/47.patch \&\& patch -p1 < 47.patch \&\& \$SUDO ./build.sh;' deps.sh
 
 # Change to python3 in deps.sh to allow installation on Ubuntu 20.04 (binwalk commit 2b78673)
-sed -i '/REQUIRED_UTILS="wget tar python"/c\REQUIRED_UTILS="wget tar python3"' deps.sh
+# sed -i '/REQUIRED_UTILS="wget tar python"/c\REQUIRED_UTILS="wget tar python3"' deps.sh
 
 # Fix for ubi_reader change of branch name + switching to poetry
-wget https://github.com/ReFirmLabs/binwalk/pull/639.patch && patch -p1 < 639.patch && rm 639.patch
+# wget https://github.com/ReFirmLabs/binwalk/pull/639.patch && patch -p1 < 639.patch && rm 639.patch
 
 # Required as we are not installing ubi_reader using poetry
 pip install lzallright
+
+# after first run to download binwalk, just run sudo ./deps.sh --yes
+# until that's all done, then run this setup.py again
+# you'll comment out whatever is finished compiling in deps.sh
+# keep running it until it finishes
 
 sudo ./deps.sh --yes
 sudo python3 ./setup.py install
